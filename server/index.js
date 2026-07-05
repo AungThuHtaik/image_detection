@@ -42,7 +42,7 @@ const upload = multer({
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
-    
+
     if (mimetype && extname) {
       return cb(null, true);
     } else {
@@ -75,8 +75,8 @@ app.post('/api/detect', upload.single('image'), async (req, res) => {
     });
 
     // Call Python Flask API
-    const pythonApiUrl = process.env.PYTHON_API_URL || 'http://localhost:5000/api/detect';
-    
+    const pythonApiUrl = process.env.PYTHON_API_URL || 'https://cruziable.pythonanywhere.com/api/detect';
+
     const response = await axios.post(pythonApiUrl, formData, {
       headers: {
         ...formData.getHeaders()
@@ -96,16 +96,16 @@ app.post('/api/detect', upload.single('image'), async (req, res) => {
     }
 
     console.error('Detection error:', error.message);
-    
+
     if (error.code === 'ECONNREFUSED') {
-      return res.status(503).json({ 
-        error: 'Python API is not available. Please ensure it is running.' 
+      return res.status(503).json({
+        error: 'Python API is not available. Please ensure it is running.'
       });
     }
 
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to process image',
-      details: error.message 
+      details: error.message
     });
   }
 });
