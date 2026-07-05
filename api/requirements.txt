@@ -1,0 +1,8 @@
+Flask
+Flask-CORS
+imageai
+pillow
+opencv-python
+numpy<2.0
+torch
+torchvision
