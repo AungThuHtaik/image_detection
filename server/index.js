@@ -20,20 +20,8 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, 'uploads');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
+// Use memory storage for uploads so serverless environments (Vercel) work properly
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage: storage,
@@ -63,16 +51,12 @@ app.post('/api/detect', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'No image file provided' });
     }
 
-    // Read the uploaded file
-    const imagePath = req.file.path;
-    const imageBuffer = fs.readFileSync(imagePath);
+    // Use the uploaded file buffer (memory storage)
+    const imageBuffer = req.file.buffer;
 
     // Create form data to send to Python API
     const formData = new FormData();
-    formData.append('image', imageBuffer, {
-      filename: req.file.originalname,
-      contentType: req.file.mimetype
-    });
+    formData.append('image', imageBuffer, req.file.originalname);
 
     // Call Python Flask API
     const pythonApiUrl = process.env.PYTHON_API_URL || 'https://cruziable.pythonanywhere.com/api/detect';
@@ -84,17 +68,9 @@ app.post('/api/detect', upload.single('image'), async (req, res) => {
       timeout: 30000 // 30 seconds timeout
     });
 
-    // Clean up uploaded file
-    fs.unlinkSync(imagePath);
-
     res.json(response.data);
 
   } catch (error) {
-    // Clean up uploaded file on error
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
-
     console.error('Detection error:', error.message);
 
     if (error.code === 'ECONNREFUSED') {
