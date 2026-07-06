@@ -27,11 +27,7 @@ function Home() {
     formData.append('image', selectedImage);
 
     try {
-      const apiBaseRaw = import.meta.env.VITE_PYTHON_API_URL || '';
-      const apiBase = apiBaseRaw.replace(/\/+$/g, '');
-      const url = apiBase ? `${apiBase}/api/detect` : '/api/detect';
-
-      const response = await axios.post(url, formData, {
+      const response = await axios.post('/api/detect', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 

@@ -58,8 +58,12 @@ app.post('/api/detect', upload.single('image'), async (req, res) => {
     const formData = new FormData();
     formData.append('image', imageBuffer, req.file.originalname);
 
-    // Call Python Flask API
-    const pythonApiUrl = process.env.PYTHON_API_URL || 'https://cruziable.pythonanywhere.com/api/detect';
+    // Call Python Flask API. Accept base or full endpoint in env.
+    const pythonApiBase = (process.env.PYTHON_API_URL || 'http://localhost:8000')
+      .replace(/\/+$/g, '');
+    const pythonApiUrl = pythonApiBase.endsWith('/api/detect')
+      ? pythonApiBase
+      : `${pythonApiBase}/api/detect`;
 
     const response = await axios.post(pythonApiUrl, formData, {
       headers: {
@@ -86,6 +90,12 @@ app.post('/api/detect', upload.single('image'), async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+const isVercel = !!process.env.VERCEL;
+
+if (!isVercel) {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+export default app;
