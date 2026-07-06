@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     try {
         const bodyBuffer = await streamToBuffer(req);
         const contentType = req.headers['content-type'];
-        const pythonApiBase = (process.env.PYTHON_API_URL || 'http://localhost:8000')
+        const pythonApiBase = (process.env.PYTHON_API_URL || process.env.PYTHON_API_BASE || 'http://127.0.0.1:5000')
             .replace(/\/+$/g, '');
         const pythonApiUrl = pythonApiBase.endsWith('/api/detect')
             ? pythonApiBase

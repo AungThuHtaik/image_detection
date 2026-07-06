@@ -59,7 +59,7 @@ app.post('/api/detect', upload.single('image'), async (req, res) => {
     formData.append('image', imageBuffer, req.file.originalname);
 
     // Call Python Flask API. Accept base or full endpoint in env.
-    const pythonApiBase = (process.env.PYTHON_API_URL || 'http://localhost:8000')
+    const pythonApiBase = (process.env.PYTHON_API_URL || process.env.PYTHON_API_BASE || 'http://127.0.0.1:5000')
       .replace(/\/+$/g, '');
     const pythonApiUrl = pythonApiBase.endsWith('/api/detect')
       ? pythonApiBase

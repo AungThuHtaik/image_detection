@@ -12,7 +12,7 @@ module.exports = async function handler(req, res) {
 
         const bodyBuffer = Buffer.concat(chunks);
         const contentType = req.headers['content-type'];
-        const pythonApiBase = (process.env.PYTHON_API_URL || 'http://32.236.141.146:8000').replace(/\/+$/g, '');
+        const pythonApiBase = (process.env.PYTHON_API_URL || process.env.PYTHON_API_BASE || 'http://127.0.0.1:5000').replace(/\/+$/g, '');
         const pythonApiUrl = pythonApiBase.endsWith('/api/detect')
             ? pythonApiBase
             : `${pythonApiBase}/api/detect`;
