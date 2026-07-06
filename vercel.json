@@ -5,24 +5,12 @@
       "src": "client/package.json",
       "use": "@vercel/static-build",
       "config": { "distDir": "dist" }
-    },
-    {
-      "src": "server/index.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "server/api/detect.js",
-      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/detect",
-      "dest": "server/api/detect.js"
-    },
-    {
       "src": "/api/(.*)",
-      "dest": "server/index.js"
+      "dest": "/api/$1"
     },
     {
       "src": "/",
