@@ -27,10 +27,12 @@ function Home() {
     formData.append('image', selectedImage);
 
     try {
-      const response = await axios.post('/api/detect', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const apiBaseRaw = import.meta.env.VITE_PYTHON_API_URL || '';
+      const apiBase = apiBaseRaw.replace(/\/+$/g, '');
+      const url = apiBase ? `${apiBase}/api/detect` : '/api/detect';
+
+      const response = await axios.post(url, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       if (response.data.success) {
@@ -41,7 +43,7 @@ function Home() {
     } catch (err) {
       console.error('Error:', err);
       setError(
-        err.response?.data?.error || 
+        err.response?.data?.error ||
         'Failed to analyze image. Please make sure the server is running.'
       );
     } finally {
@@ -63,7 +65,7 @@ function Home() {
           Image Recognition AI
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Upload an image and let our AI identify what's in it. 
+          Upload an image and let our AI identify what's in it.
           Powered by MobileNetV2 neural network.
         </p>
       </div>
@@ -74,7 +76,7 @@ function Home() {
           <h2 className="text-2xl font-semibold text-gray-800 mb-6">
             Upload Image
           </h2>
-          
+
           <ImageUpload
             onImageSelect={handleImageSelect}
             imagePreview={imagePreview}
@@ -85,11 +87,10 @@ function Home() {
             <button
               onClick={handleDetect}
               disabled={!selectedImage || loading}
-              className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all ${
-                !selectedImage || loading
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95'
-              }`}
+              className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all ${!selectedImage || loading
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95'
+                }`}
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -139,7 +140,7 @@ function Home() {
           <h2 className="text-2xl font-semibold text-gray-800 mb-6">
             Detection Results
           </h2>
-          
+
           <ResultsDisplay predictions={predictions} loading={loading} />
         </div>
       </div>
